@@ -47,6 +47,7 @@ static const char
 #pragma implementation "p_inter.h"
 #endif
 #include "p_inter.h"
+#include "w_wad.h"
 
 
 #define BONUSADD        6

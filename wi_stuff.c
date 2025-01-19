@@ -1624,7 +1624,7 @@ void WI_loadData(void)
 	}
 
 	/* More hacks on minus sign. */
-	wiminus = -1;
+	wiminus = (void *)-1;
 	if(W_CheckNumForName("WIMINUS")>0)
 		wiminus = W_CacheLumpName("WIMINUS", PU_STATIC);
 

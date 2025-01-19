@@ -59,7 +59,7 @@ patch_t*                sttminus;
 void STlib_init(void)
 {
 int rc;
-sttminus=-1;
+sttminus=(void *)-1;
 rc=W_CheckNumForName("STTMINUS");
 if(rc>0)
 	sttminus = (patch_t *) W_CacheLumpName("STTMINUS", PU_STATIC);

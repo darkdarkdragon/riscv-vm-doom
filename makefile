@@ -4,15 +4,19 @@
 #
 # $Log:$
 #
-CC=  gcc_v1  # gcc or g++
+CC= riscv64-elf-gcc  # gcc or g++
 
 #CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM
 #CFLAGS=-g -m80387 -DALLOCA
-CFLAGS= -I. -O
+#CFLAGS= -I. -O -nostartfiles -g -march=rv32im  -mabi=ilp32
+CFLAGS= -I. -I./riscv -O -static -nostdlib -nostartfiles -march=rv32im  -mabi=ilp32 -std=gnu11
+#CFLAGS= -I. -O -static -march=rv32im  -mabi=ilp32
 #LDFLAGS=-L/usr/X11R6/lib
 #LIBS=-lXext -lX11 -lnsl -lm
 LDFLAGS=
-LIBS= -lgcc -lgr -lpc
+#LIBS= -lgcc -lgr -lpc
+#LIBS= -lm -lgcc
+LIBS= -lgcc
 
 # subdirectory for objects
 O=obj
@@ -22,7 +26,6 @@ OBJS=				\
 		$(O)/doomdef.o		\
 		$(O)/doomstat.o		\
 		$(O)/dstrings.o		\
-		$(O)/i_sound.o		\
 		$(O)/i_net.o			\
 		$(O)/tables.o			\
 		$(O)/f_finale.o		\
@@ -87,12 +90,16 @@ SYSOBJ	=	\
 		$(O)/xmalloc.o		\
 		$(O)/i_system.o		\
 		$(O)/i_video.o		\
-		$(O)/dpmi.o
+		$(O)/i_sound.o		\
+		$(O)/stdlib.o		\
+		$(O)/stdio.o		\
+		$(O)/string.o		\
+		$(O)/ctype.o		\
 
 all:	 $(O)/doom
 
 clean:
-	del $(O)\*.o $(O)\doom
+	rm $(O)/*.o $(O)/doom
 
 
 $(O)/doom:	$(OBJS) $(SYSOBJ) $(O)/i_main.o
@@ -112,8 +119,8 @@ $(O)/doomstat.o:
 	$(CC) $(CFLAGS) -c doomstat.c -o $@
 $(O)/dstrings.o:
 	$(CC) $(CFLAGS) -c dstrings.c -o $@
-$(O)/i_sound.o:
-	$(CC) $(CFLAGS) -c i_sound.c -o $@
+# $(O)/i_sound.o:
+# 	$(CC) $(CFLAGS) -c i_sound.c -o $@
 $(O)/i_net.o:
 	$(CC) $(CFLAGS) -c i_net.c -o $@
 $(O)/tables.o:
@@ -183,7 +190,8 @@ $(O)/p_telept.o:
 $(O)/p_tick.o:
 	$(CC) $(CFLAGS) -c p_tick.c -o $@
 $(O)/p_saveg.o:
-	$(CC) -I. -c p_saveg.c -o $@
+	$(CC) $(CFLAGS) -c p_saveg.c -o $@
+#	 $(CC) -I. -c p_saveg.c -o $@
 $(O)/p_user.o:
 	$(CC) $(CFLAGS) -c p_user.c -o $@
 $(O)/r_bsp.o:
@@ -239,12 +247,12 @@ $(O)/ashrdi3.o:
 #$(O)/i_system.o:
 #	$(CC) $(CFLAGS) -c go32/i_system.c -o $@
 #go32 DPMI
-$(O)/i_video.o:
-	$(CC) $(CFLAGS) -c go32_dpmi/i_video.c -o $@
-$(O)/i_system.o:
-	$(CC) $(CFLAGS) -c go32_dpmi/i_system.c -o $@
-$(O)/dpmi.o:
-	$(CC) $(CFLAGS) -c go32_dpmi/dpmi.c -o $@
+# $(O)/i_video.o:
+# 	$(CC) $(CFLAGS) -c go32_dpmi/i_video.c -o $@
+# $(O)/i_system.o:
+# 	$(CC) $(CFLAGS) -c go32_dpmi/i_system.c -o $@
+# $(O)/dpmi.o:
+# 	$(CC) $(CFLAGS) -c go32_dpmi/dpmi.c -o $@
 # NULL
 #$(O)/i_video.o:
 #	$(CC) $(CFLAGS) -c null/i_video.c -o $@
@@ -254,6 +262,22 @@ $(O)/dpmi.o:
 #GCC 1.39
 $(O)/xmalloc.o:
 	$(CC) $(CFLAGS) -c go32/xmalloc.c -o $@
+
+#RISCV-VM
+$(O)/i_video.o:
+	$(CC) $(CFLAGS) -c riscv/i_video.c -o $@
+$(O)/i_system.o:
+	$(CC) $(CFLAGS) -c riscv/i_system.c -o $@
+$(O)/i_sound.o:
+	$(CC) $(CFLAGS) -c riscv/i_sound.c -o $@
+$(O)/stdlib.o:
+	$(CC) $(CFLAGS) -c riscv/stdlib.c -o $@
+$(O)/stdio.o:
+	$(CC) $(CFLAGS) -c riscv/stdio.c -o $@
+$(O)/string.o:
+	$(CC) $(CFLAGS) -c riscv/string.c -o $@
+$(O)/ctype.o:
+	$(CC) $(CFLAGS) -c riscv/ctype.c -o $@
 
 
 #############################################################

@@ -35,6 +35,7 @@ static const char
 
 #include <ctype.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "doomdef.h"
 

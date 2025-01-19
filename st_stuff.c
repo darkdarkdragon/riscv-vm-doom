@@ -1175,7 +1175,7 @@ void ST_loadGraphics(void)
 
 	/* status bar background bits */
 
-	sbar = -1;
+	sbar = (void *)-1;
 	if(W_CheckNumForName("STBAR")>0)
 		sbar = (patch_t *) W_CacheLumpName("STBAR", PU_STATIC);
 

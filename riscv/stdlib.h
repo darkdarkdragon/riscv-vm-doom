@@ -15,5 +15,6 @@ long atol(const char *str);
 void exit(int);
 char *getenv(const char *);
 int abs(int x);
+void _init(int cid, int nc);
 
 #endif /* __STDLIB__ */

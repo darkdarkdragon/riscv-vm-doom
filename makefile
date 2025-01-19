@@ -9,7 +9,7 @@ CC= riscv64-elf-gcc  # gcc or g++
 #CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM
 #CFLAGS=-g -m80387 -DALLOCA
 #CFLAGS= -I. -O -nostartfiles -g -march=rv32im  -mabi=ilp32
-CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im  -mabi=ilp32
+CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im_zicsr  -mabi=ilp32 -T ./riscv/test.ld
 #CFLAGS= -I. -O -static -march=rv32im  -mabi=ilp32
 #LDFLAGS=-L/usr/X11R6/lib
 #LIBS=-lXext -lX11 -lnsl -lm
@@ -99,6 +99,7 @@ SYSOBJ	=	\
 		$(O)/fcntl.o		\
 		$(O)/stat.o			\
 		$(O)/unistd.o		\
+		$(O)/crt.o		\
 #		$(O)/xmalloc.o		\
 
 all:	 $(O)/doom
@@ -279,6 +280,8 @@ $(O)/stat.o:
 	$(CC) $(CFLAGS) -c riscv/sys/stat.c -o $@
 $(O)/unistd.o:
 	$(CC) $(CFLAGS) -c riscv/unistd.c -o $@
+$(O)/crt.o:
+	$(CC) $(CFLAGS) -c riscv/crt.S -o $@
 
 $(O)/i_video.o:
 	$(CC) $(CFLAGS) -c riscv/i_video.c -o $@

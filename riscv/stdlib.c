@@ -1,6 +1,18 @@
 
 #include "stdlib.h"
 
+int __attribute__((weak)) main(int argc, char** argv)
+{
+  // single-threaded programs override this function.
+//   printstr("Implement main(), foo!\n");
+  return -1;
+}
+
+uintptr_t __attribute__((weak)) handle_trap(uintptr_t cause, uintptr_t epc, uintptr_t regs[32])
+{
+//  tohost_exit(1337);
+}
+
 void *memset(void *dest, int byte, size_t len) {
   if ((((uintptr_t)dest | len) & (sizeof(uintptr_t) - 1)) == 0) {
     uintptr_t word = byte & 0xFF;
@@ -20,8 +32,7 @@ void *memset(void *dest, int byte, size_t len) {
 }
 
 void *memcpy(void *dest, const void *src, size_t len) {
-  if ((((uintptr_t)dest | (uintptr_t)src | len) & (sizeof(uintptr_t) - 1)) ==
-      0) {
+  if ((((uintptr_t)dest | (uintptr_t)src | len) & (sizeof(uintptr_t) - 1)) == 0) {
     const uintptr_t *s = src;
     uintptr_t *d = dest;
     uintptr_t *end = dest + len;
@@ -74,11 +85,30 @@ char *getenv(const char *) { return 0; }
 int my_abs(int x) { return x < 0 ? -x : x; }
 
 void exit(int) {
-    // @TODO
-    while(1);
+  // @TODO
+  while (1)
+    ;
 }
 
 int atoi(const char *str) {
-    // @TODO
-    return 0;
+  // @TODO
+  return 0;
+}
+
+void _init(int cid, int nc) {
+//   init_tls();
+//   thread_entry(cid, nc);
+
+  // only single-threaded programs should ever get here.
+  int ret = main(0, 0);
+
+//   char buf[NUM_COUNTERS * 32] __attribute__((aligned(64)));
+//   char *pbuf = buf;
+//   for (int i = 0; i < NUM_COUNTERS; i++)
+//     if (counters[i])
+//       pbuf += sprintf(pbuf, "%s = %d\n", counter_names[i], counters[i]);
+//   if (pbuf != buf)
+//     printstr(buf);
+
+  exit(ret);
 }

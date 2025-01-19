@@ -44,3 +44,24 @@ void strupr(char *str) {
         str++;
     }
 }
+
+char *strncpy(char *dest, const char *src, size_t n) {
+    // @TODO
+    return NULL;
+}
+
+
+int strncasecmp(const char *, const char *, size_t) {
+    // @TODO
+    return -1;
+}
+
+int strcasecmp(const char *, const char *) {
+    // @TODO
+    return -1;
+}
+
+int strncmp(const char *__s1, const char *__s2, size_t __n) {
+    // @TODO
+    return -1;
+}

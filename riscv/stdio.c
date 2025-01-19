@@ -253,3 +253,33 @@ int sprintf(char *str, const char *fmt, ...) {
   va_end(ap);
   return str - str0;
 }
+
+int fprintf(FILE *__restrict, const char *__restrict, ...) {
+  // @OTDO
+  return 0;
+}
+
+int feof(FILE *) { return 0; }
+
+int fscanf(FILE *__restrict, const char *__restrict, ...) { return 0; }
+
+int sscanf(const char *__restrict, const char *__restrict, ...) { return 0; }
+
+void setbuf(FILE *restrict stream, char *restrict buffer) {}
+
+int getchar(void) { return 0; }
+
+FILE *fopen(const char *__restrict __filename, const char *__restrict __mode) { return 0; }
+
+int fclose(FILE *f) { return 0; }
+
+size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems, FILE *__restrict __stream) { return 0; }
+
+long ftell(FILE *f) { return 0; }
+
+int fseek(FILE *f, long a1, int a2) { return 0; }
+
+int fflush(FILE *stream) {
+    // @TODO
+    return 0;
+}

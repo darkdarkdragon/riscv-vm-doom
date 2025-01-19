@@ -9,7 +9,7 @@ CC= riscv64-elf-gcc  # gcc or g++
 #CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM
 #CFLAGS=-g -m80387 -DALLOCA
 #CFLAGS= -I. -O -nostartfiles -g -march=rv32im  -mabi=ilp32
-CFLAGS= -I. -I./riscv -O -static -nostdlib -nostartfiles -march=rv32im  -mabi=ilp32 -std=gnu11
+CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im  -mabi=ilp32
 #CFLAGS= -I. -O -static -march=rv32im  -mabi=ilp32
 #LDFLAGS=-L/usr/X11R6/lib
 #LIBS=-lXext -lX11 -lnsl -lm
@@ -17,6 +17,7 @@ LDFLAGS=
 #LIBS= -lgcc -lgr -lpc
 #LIBS= -lm -lgcc
 LIBS= -lgcc
+#LIBS= 
 
 # subdirectory for objects
 O=obj
@@ -87,7 +88,6 @@ OBJS=				\
 #		$(O)/ashrdi3.o
 
 SYSOBJ	=	\
-		$(O)/xmalloc.o		\
 		$(O)/i_system.o		\
 		$(O)/i_video.o		\
 		$(O)/i_sound.o		\
@@ -95,16 +95,23 @@ SYSOBJ	=	\
 		$(O)/stdio.o		\
 		$(O)/string.o		\
 		$(O)/ctype.o		\
+		$(O)/malloc.o		\
+		$(O)/fcntl.o		\
+		$(O)/stat.o			\
+		$(O)/unistd.o		\
+#		$(O)/xmalloc.o		\
 
 all:	 $(O)/doom
 
 clean:
-	rm $(O)/*.o $(O)/doom
+	rm $(O)/*.o  || true
+	rm $(O)/doom || true
 
 
 $(O)/doom:	$(OBJS) $(SYSOBJ) $(O)/i_main.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(SYSOBJ) $(O)/i_main.o -o $(O)/doom $(LIBS)
-	copy /Y $(O)\doom test
+	cp $(O)/doom test
+#	copy /Y $(O)\doom test
 #	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(SYSOBJ) $(O)/i_main.o -o $(O)/doom $(LIBS)
 #	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o -o $(O)/dosdoom.exe $(LIBS)
 
@@ -260,10 +267,19 @@ $(O)/ashrdi3.o:
 #	$(CC) $(CFLAGS) -c null/i_system.c -o $@
 
 #GCC 1.39
-$(O)/xmalloc.o:
-	$(CC) $(CFLAGS) -c go32/xmalloc.c -o $@
+#$(O)/xmalloc.o:
+#	$(CC) $(CFLAGS) -c go32/xmalloc.c -o $@
 
 #RISCV-VM
+$(O)/malloc.o:
+	$(CC) $(CFLAGS) -c riscv/malloc.c -o $@
+$(O)/fcntl.o:
+	$(CC) $(CFLAGS) -c riscv/fcntl.c -o $@
+$(O)/stat.o:
+	$(CC) $(CFLAGS) -c riscv/sys/stat.c -o $@
+$(O)/unistd.o:
+	$(CC) $(CFLAGS) -c riscv/unistd.c -o $@
+
 $(O)/i_video.o:
 	$(CC) $(CFLAGS) -c riscv/i_video.c -o $@
 $(O)/i_system.o:

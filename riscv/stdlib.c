@@ -72,3 +72,13 @@ long atol(const char *str) {
 char *getenv(const char *) { return 0; }
 
 int my_abs(int x) { return x < 0 ? -x : x; }
+
+void exit(int) {
+    // @TODO
+    while(1);
+}
+
+int atoi(const char *str) {
+    // @TODO
+    return 0;
+}

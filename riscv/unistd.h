@@ -12,7 +12,7 @@
 
 typedef uint32_t off_t;
 
-int access(const char *, int);
-off_t lseek(int, off_t, int);
+int access(const char *pathname, int mode);
+off_t lseek(int fildes, off_t offset, int whence);
 
 #endif

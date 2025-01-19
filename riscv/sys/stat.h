@@ -11,7 +11,7 @@ struct stat {
   size_t st_size;           /* [XSI] file size, in bytes */
 };
 
-int fstat(int, struct stat *);
-int mkdir(const char *, mode_t);
+int fstat(int filedes, struct stat *buf);
+int mkdir(const char *pathname, mode_t mode);
 
 #endif // __SYSSTAT__

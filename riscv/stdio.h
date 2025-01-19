@@ -25,13 +25,13 @@ int getchar(void);
 
 FILE *fopen(const char *__restrict __filename, const char *__restrict __mode);
 int fclose(FILE *);
-size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems,
-             FILE *__restrict __stream);
+size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems, FILE *__restrict __stream);
 long ftell(FILE *);
 int fseek(FILE *, long, int);
 int fprintf(FILE *__restrict, const char *__restrict, ...);
 int feof(FILE *);
-int	 fscanf(FILE * __restrict, const char * __restrict, ...);
-int	 sscanf(const char * __restrict, const char * __restrict, ...);
+int fscanf(FILE *__restrict, const char *__restrict, ...);
+int sscanf(const char *__restrict, const char *__restrict, ...);
+int fflush(FILE *stream);
 
 #endif /* __STDIO__ */

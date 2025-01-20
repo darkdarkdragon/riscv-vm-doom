@@ -8,9 +8,31 @@
 #define CHAR_BIT 8
 // typedef uint32_t uintptr_t;
 
-static uintptr_t syscall(uintptr_t which, uint32_t arg0, uint64_t arg1, uint64_t arg2) { return 0; }
+// static uint32_t syscall(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6, uint32_t
+// which) {
+//   return 0;
+// }
+static uint32_t syscall(uint32_t which, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5,
+                        uint32_t arg6) {
+  uint32_t result;
+  asm volatile("mv a0, %1\n"  // Load arg0 into a0
+               "mv a1, %2\n"  // Load arg1 into a1
+               "mv a2, %3\n"  // Load arg2 into a2
+               "mv a3, %4\n"  // Load arg3 into a3
+               "mv a4, %5\n"  // Load arg4 into a4
+               "mv a5, %6\n"  // Load arg5 into a5
+               "mv a6, %7\n"  // Load arg6 into a6
+               "mv a7, %8\n"  // Load which (system call number) into a7
+               "ecall\n"      // Make the system call
+               "mv %0, a0\n"  // Retrieve the result from a0
+               : "=r"(result) // Output: result
+               : "r"(arg0), "r"(arg1), "r"(arg2), "r"(arg3), "r"(arg4), "r"(arg5), "r"(arg6), "r"(which) // Inputs
+               : "memory", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7"                                // Clobbered registers
+  );
+  return result;
+}
 
-void printstr(const char *s) { syscall(SYS_write, 1, (uintptr_t)s, strlen(s)); }
+// void printstr(const char *s) { syscall(SYS_write, 1, (uintptr_t)s, strlen(s)); }
 
 int putchar(int ch) {
   static __thread char buf[64] __attribute__((aligned(64)));
@@ -19,7 +41,21 @@ int putchar(int ch) {
   buf[buflen++] = ch;
 
   if (ch == '\n' || buflen == sizeof(buf)) {
-    syscall(SYS_write, 1, (uintptr_t)buf, buflen);
+    syscall(SYS_write, stdout_fd, (uintptr_t)buf, buflen, 0, 0, 0, 0);
+    buflen = 0;
+  }
+
+  return 0;
+}
+
+int putchar_err(int ch) {
+  static __thread char buf[64] __attribute__((aligned(64)));
+  static __thread int buflen = 0;
+
+  buf[buflen++] = ch;
+
+  if (ch == '\n' || buflen == sizeof(buf)) {
+    syscall(SYS_write, stderr_fd, (uintptr_t)buf, buflen, 0, 0, 0, 0);
     buflen = 0;
   }
 
@@ -254,32 +290,74 @@ int sprintf(char *str, const char *fmt, ...) {
   return str - str0;
 }
 
-int fprintf(FILE *__restrict, const char *__restrict, ...) {
-  // @OTDO
+// int fprintf(FILE *__restrict, const char *__restrict, ...)
+int fprintf(FILE *stream, const char *fmt, ...) {
+  if (stream != stdout && stream != stderr) {
+    fprintf(stderr, "fprintf: invalid stream %d\n", stream);
+    return 0;
+  }
+  va_list ap;
+  va_start(ap, fmt);
+
+  void *pc = (void *)putchar;
+  if (stream == stderr) {
+    pc = (void *)putchar_err;
+  }
+
+  vprintfmt(pc, 0, fmt, ap);
+
+  va_end(ap);
+  return 0; // incorrect return value, but who cares, anyway?
+}
+
+int feof(FILE *file) {
+  fprintf(stderr, "feof: unimplemented file %d\n", file);
   return 0;
 }
 
-int feof(FILE *) { return 0; }
+int fscanf(FILE *stream, const char *format, ...) {
+  fprintf(stderr, "fscanf: unimplemented stream %d\n", stream);
+  return 0;
+}
 
-int fscanf(FILE *__restrict, const char *__restrict, ...) { return 0; }
+int sscanf(const char *__restrict str, const char *__restrict format, ...) {
+  fprintf(stderr, "sscanf: unimplemented string %s\n", str);
+  return 0;
+}
 
-int sscanf(const char *__restrict, const char *__restrict, ...) { return 0; }
+void setbuf(FILE *restrict stream, char *restrict buffer) { fprintf(stderr, "setbuf: unimplemented stream %d\n", stream); }
 
-void setbuf(FILE *restrict stream, char *restrict buffer) {}
+int getchar(void) {
+  fprintf(stderr, "getchar: unimplemented\n");
+  return 0;
+}
 
-int getchar(void) { return 0; }
+FILE *fopen(const char *__restrict __filename, const char *__restrict __mode) {
+  fprintf(stderr, "fopen: unimplemented filename %s\n", __filename);
+  return 0;
+}
 
-FILE *fopen(const char *__restrict __filename, const char *__restrict __mode) { return 0; }
+int fclose(FILE *f) {
+  fprintf(stderr, "fclose: unimplemented file %d\n", f);
+  return 0;
+}
 
-int fclose(FILE *f) { return 0; }
+size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems, FILE *__restrict __stream) {
+  fprintf(stderr, "fread: unimplemented file %d\n", __stream);
+  return 0;
+}
 
-size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems, FILE *__restrict __stream) { return 0; }
+long ftell(FILE *f) {
+  fprintf(stderr, "ftell: unimplemented file %d\n", f);
+  return 0;
+}
 
-long ftell(FILE *f) { return 0; }
-
-int fseek(FILE *f, long a1, int a2) { return 0; }
+int fseek(FILE *f, long a1, int a2) {
+  fprintf(stderr, "fseek: unimplemented file %d\n", f);
+  return 0;
+}
 
 int fflush(FILE *stream) {
-    // @TODO
-    return 0;
+  fprintf(stderr, "fflush: unimplemented stream %d\n", stream);
+  return 0;
 }

@@ -9,6 +9,10 @@
 // typedef int size_t;
 typedef int32_t FILE;
 
+#define stdout_fd 1
+#define stdin_fd 0
+#define stderr_fd 2
+
 #define stdout ((FILE *)1)
 #define stdin ((FILE *)0)
 #define stderr ((FILE *)2)

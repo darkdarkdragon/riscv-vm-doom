@@ -830,6 +830,7 @@ void D_DoomMain (void)
 	int p;
 	char file[256];
 
+	printf ("\nStarting DOOM!\n");
 	FindResponseFile ();
 
 	IdentifyVersion ();

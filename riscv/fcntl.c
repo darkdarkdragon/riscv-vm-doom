@@ -1,18 +1,23 @@
 #include "fcntl.h"
-
+#include <stdio.h>
 
 int open(const char *name, int mode, ...) {
-    return 0;
+  fprintf(stderr, "open: unimplemented name %s\n", name);
+  return 0;
 }
 
 int close(int fd) {
-    return 0;
+  fprintf(stderr, "close: unimplemented fd %d\n", fd);
+
+  return 0;
 }
 
 size_t read(int fd, void *buf, size_t size) {
-    return 0;
+  fprintf(stderr, "read: unimplemented fd %d\n", fd);
+  return 0;
 }
 
 size_t write(int __fd, const void *__buf, size_t __nbyte) {
-    return 0;;
+  fprintf(stderr, "write: unimplemented fd %d\n", __fd);
+  return 0;
 }

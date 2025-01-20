@@ -4,20 +4,25 @@
 #
 # $Log:$
 #
-CC= riscv64-elf-gcc  # gcc or g++
+#RISCV_PREFIX ?= riscv$(XLEN)-unknown-elf-
+RISCV_PREFIX = riscv64-elf-
+CC = $(RISCV_PREFIX)gcc
+#CC= riscv64-elf-gcc  # gcc or g++
 
 #CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM
 #CFLAGS=-g -m80387 -DALLOCA
 #CFLAGS= -I. -O -nostartfiles -g -march=rv32im  -mabi=ilp32
-CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im_zicsr  -mabi=ilp32 -T ./riscv/test.ld
+CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im_zicsr  -mabi=ilp32 -T ./riscv/test.ld  -mcmodel=medany
 #CFLAGS= -I. -O -static -march=rv32im  -mabi=ilp32
 #LDFLAGS=-L/usr/X11R6/lib
 #LIBS=-lXext -lX11 -lnsl -lm
-LDFLAGS=
+LDFLAGS= -mcmodel=medany
 #LIBS= -lgcc -lgr -lpc
 #LIBS= -lm -lgcc
 LIBS= -lgcc
 #LIBS= 
+OBJDUMP = $(RISCV_PREFIX)objdump
+RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data 
 
 # subdirectory for objects
 O=obj
@@ -115,6 +120,12 @@ $(O)/doom:	$(OBJS) $(SYSOBJ) $(O)/i_main.o
 #	copy /Y $(O)\doom test
 #	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(SYSOBJ) $(O)/i_main.o -o $(O)/doom $(LIBS)
 #	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(O)/i_main.o -o $(O)/dosdoom.exe $(LIBS)
+
+$(O)/doom.dump:	$(O)/doom
+	$(RISCV_OBJDUMP) $(O)/doom  > $@
+
+$(O)/doom.symbols:	$(O)/doom
+	$(OBJDUMP) --show-all-symbols -x $(O)/doom  > $@
 
 $(O)/%.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -298,6 +309,10 @@ $(O)/string.o:
 $(O)/ctype.o:
 	$(CC) $(CFLAGS) -c riscv/ctype.c -o $@
 
+#------------------------------------------------------------
+# Default
+
+all: $(O)/doom.dump
 
 #############################################################
 #

@@ -4,7 +4,6 @@
 #include "stdio.h"
 #include "string.h"
 
-#define SYS_write 64
 #define CHAR_BIT 8
 // typedef uint32_t uintptr_t;
 
@@ -12,8 +11,7 @@
 // which) {
 //   return 0;
 // }
-static uint32_t syscall(uint32_t which, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5,
-                        uint32_t arg6) {
+uint32_t syscall(uint32_t which, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6) {
   uint32_t result;
   asm volatile("mv a0, %1\n"  // Load arg0 into a0
                "mv a1, %2\n"  // Load arg1 into a1

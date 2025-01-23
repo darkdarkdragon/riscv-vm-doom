@@ -35,6 +35,7 @@ static const char
 
 #include "m_argv.h"
 #include "d_main.h"
+#include "malloc.h"
 
 int
 main
@@ -44,6 +45,7 @@ main
        int b_ssp;
 	myargc = argc;
 	myargv = argv;
+        malloc_init();
 
 /*enter supervisor mode on the x68000 ... not sure what the difference is 
  between SUPER vs B_SUPER */

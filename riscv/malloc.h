@@ -9,6 +9,7 @@ typedef uint32_t size_t;
 #define NULL 0
 #endif
 
+void malloc_init(void);
 void *malloc(size_t __size);
 void *realloc(void * __ptr, size_t __size);
 

@@ -107,12 +107,14 @@ SYSOBJ	=	\
 		$(O)/crt.o		\
 #		$(O)/xmalloc.o		\
 
-all:	 $(O)/doom
+#all:	 $(O)/doom
 
 clean:
 	rm $(O)/*.o  || true
 	rm $(O)/doom || true
+	rm test/doom || true
 
+remake: clean all
 
 $(O)/doom:	$(OBJS) $(SYSOBJ) $(O)/i_main.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(SYSOBJ) $(O)/i_main.o -o $(O)/doom $(LIBS)
@@ -311,8 +313,9 @@ $(O)/ctype.o:
 
 #------------------------------------------------------------
 # Default
+.DEFAULT_GOAL := all
 
-all: $(O)/doom.dump
+all: $(O)/doom.dump $(O)/doom.symbols
 
 #############################################################
 #

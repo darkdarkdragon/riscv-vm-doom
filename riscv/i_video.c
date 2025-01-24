@@ -6,6 +6,7 @@
 #include "d_main.h"
 
 #include "doomdef.h"
+#include <stdio.h>
 
 
 /* */
@@ -117,6 +118,7 @@ void I_SetPalette (byte* palette)
 void I_StartFrame (void)
 {
 	/* er? */
+	printf("I_StartFrame\n");
 
 }
 

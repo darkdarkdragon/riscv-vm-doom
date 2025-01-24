@@ -27,6 +27,7 @@ static const char
 */
 
 #include <ctype.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
 #ifdef __WATCOMC__
@@ -236,6 +237,8 @@ printf("W_AddFile %s\n",filename);
 
 	storehandle = reloadname ? -1 : handle;
 
+	printf("startlump %d numlumps %d storehandle %d\n", startlump, numlumps, storehandle);
+
 	for (i=startlump; i<numlumps; i++,lump_p++, fileinfo++)
 	{
 		lump_p->handle = storehandle;
@@ -243,6 +246,7 @@ printf("W_AddFile %s\n",filename);
 		lump_p->size = LONG(fileinfo->size);
 		strncpy (lump_p->name, fileinfo->name, 8);
 	}
+	printf("done W_AddFile\n");
 
 	if (reloadname)
 		close (handle);
@@ -327,6 +331,7 @@ void W_InitMultipleFiles (char** filenames)
 
 	if (!numlumps)
 		I_Error ("W_InitFiles: no files found");
+	printf("numlumps %d sizeof(*lumpcache) %d\n", numlumps, sizeof(*lumpcache));
 
 	/* set up caching */
 	size = numlumps * sizeof(*lumpcache);
@@ -335,6 +340,7 @@ void W_InitMultipleFiles (char** filenames)
 	if (!lumpcache)
 		I_Error ("Couldn't allocate lumpcache");
 
+	printf("lumpcache %p size %d\n", lumpcache, size);
 	memset (lumpcache,0, size);
 }
 
@@ -391,6 +397,7 @@ int W_CheckNumForName (char* name)
 
 	/* case insensitive */
 	strupr (name8.s);
+	// printf("W_CheckNumForName %s up %s\n", name, name8.s);
 
 	v1 = name8.x[0];
 	v2 = name8.x[1];

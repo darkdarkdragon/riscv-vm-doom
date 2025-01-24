@@ -75,7 +75,7 @@ void printhex(uint64_t x) {
 */
 
 static inline void printnum(void (*putch)(int, void **), void **putdat, unsigned long long num, unsigned base, int width, int padc) {
-  unsigned digs[sizeof(num) * CHAR_BIT];
+  unsigned int digs[sizeof(num) * CHAR_BIT];
   int pos = 0;
 
   while (1) {
@@ -208,8 +208,13 @@ static void vprintfmt(void (*putch)(int, void **), void **putdat, const char *fm
         putch(' ', putdat);
       break;
 
+    case 'i':
     // (signed) decimal
     case 'd':
+      if (precision > 0) {
+        width = precision;
+        padc = '0';
+      }
       num = getint(&ap, lflag);
       if ((long long)num < 0) {
         putch('-', putdat);
@@ -288,6 +293,25 @@ int sprintf(char *str, const char *fmt, ...) {
   return str - str0;
 }
 
+int vfprintf(FILE *stream, const char *fmt, va_list ap) {
+  if (stream != stdout && stream != stderr) {
+    fprintf(stderr, "fprintf: invalid stream %d\n", stream);
+    return 0;
+  }
+  // va_list ap;
+  // va_start(ap, fmt);
+
+  void *pc = (void *)putchar;
+  if (stream == stderr) {
+    pc = (void *)putchar_err;
+  }
+
+  vprintfmt(pc, 0, fmt, ap);
+
+  // va_end(ap);
+  return 0; // incorrect return value, but who cares, anyway?
+}
+
 // int fprintf(FILE *__restrict, const char *__restrict, ...)
 int fprintf(FILE *stream, const char *fmt, ...) {
   if (stream != stdout && stream != stderr) {
@@ -309,35 +333,55 @@ int fprintf(FILE *stream, const char *fmt, ...) {
 }
 
 int feof(FILE *file) {
-  fprintf(stderr, "feof: unimplemented file %d\n", file);
-  return 0;
+  uint32_t res = syscall(SYS_feof, (uint32_t)file, 0, 0, 0, 0, 0, 0);
+  // fprintf(stderr, "feof: file %d res %d\n", file, (int)res);
+  return (int)res;
 }
 
 int fscanf(FILE *stream, const char *format, ...) {
-  fprintf(stderr, "fscanf: unimplemented stream %d\n", stream);
-  return 0;
+  // fprintf(stderr, "fscanf stream %d format '%s'\n", stream, format);
+
+  va_list ap;
+  va_start(ap, format);
+  // hack: allow exactly 2 arguments
+  const char *arg1 = va_arg(ap, char *);
+  const char *arg2 = va_arg(ap, char *);
+
+  uint32_t res = syscall(SYS_fscanf, (uint32_t)stream, (uint32_t)format, (uint32_t)arg1, (uint32_t)arg2, 0, 0, 0);
+
+  va_end(ap);
+
+  return (int)res;
 }
 
-int sscanf(const char *__restrict str, const char *__restrict format, ...) {
-  fprintf(stderr, "sscanf: unimplemented string %s\n", str);
-  return 0;
-}
+// int sscanf(const char *__restrict str, const char *__restrict format, ...) {
+//   fprintf(stderr, "sscanf: unimplemented string %s\n", str);
+//   return 0;
+// }
 
-void setbuf(FILE *restrict stream, char *restrict buffer) { fprintf(stderr, "setbuf: unimplemented stream %d\n", stream); }
+void setbuf(FILE *restrict stream, char *restrict buffer) {
+  if ((stream == stdout || stream == stderr) && buffer == NULL) {
+    return;
+  }
+  fprintf(stderr, "setbuf: unimplemented stream %d buffer %p\n", stream, buffer);
+}
 
 int getchar(void) {
   fprintf(stderr, "getchar: unimplemented\n");
   return 0;
 }
 
-FILE *fopen(const char *__restrict __filename, const char *__restrict __mode) {
-  fprintf(stderr, "fopen: unimplemented filename %s\n", __filename);
-  return 0;
+FILE *fopen(const char *__restrict filename, const char *__restrict mode) {
+  fprintf(stderr, "fopen: filename %s mode %s\n", filename, mode);
+
+  uint32_t res = syscall(SYS_fopen, (uint32_t)filename, (uint32_t)mode, 0, 0, 0, 0, 0);
+  return (FILE *)res;
 }
 
-int fclose(FILE *f) {
-  fprintf(stderr, "fclose: unimplemented file %d\n", f);
-  return 0;
+int fclose(FILE *file) {
+  fprintf(stderr, "fclose: file %d\n", file);
+  uint32_t res = syscall(SYS_fclose, (uint32_t)file, 0, 0, 0, 0, 0, 0);
+  return (int)res;
 }
 
 size_t fread(void *__restrict __ptr, size_t __size, size_t __nitems, FILE *__restrict __stream) {
@@ -358,4 +402,111 @@ int fseek(FILE *f, long a1, int a2) {
 int fflush(FILE *stream) {
   fprintf(stderr, "fflush: unimplemented stream %d\n", stream);
   return 0;
+}
+
+// Custom implementation of isspace
+int isspace_custom(char c) { return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'); }
+
+// Custom implementation of strtoul
+unsigned long strtoul_custom(const char *str, char **endptr, int base) {
+  const char *ptr = str;
+  unsigned long result = 0;
+  int digit;
+
+  // Skip leading spaces
+  while (isspace_custom(*ptr)) {
+    ptr++;
+  }
+
+  // Handle optional "0x" or "0X" for hexadecimal
+  if (base == 16 && *ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X')) {
+    ptr += 2;
+  }
+
+  while (*ptr) {
+    if (*ptr >= '0' && *ptr <= '9') {
+      digit = *ptr - '0';
+    } else if (*ptr >= 'a' && *ptr <= 'f') {
+      digit = *ptr - 'a' + 10;
+    } else if (*ptr >= 'A' && *ptr <= 'F') {
+      digit = *ptr - 'A' + 10;
+    } else {
+      break;
+    }
+
+    if (digit >= base) {
+      break;
+    }
+
+    result = result * base + digit;
+    ptr++;
+  }
+
+  if (endptr) {
+    *endptr = (char *)ptr;
+  }
+
+  return result;
+}
+
+// Custom implementation of sscanf
+int sscanf(const char *input, const char *format, ...) {
+  const char *in_ptr = input;
+  const char *fmt_ptr = format;
+  va_list args;
+  va_start(args, format);
+  int count = 0;
+
+  while (*fmt_ptr) {
+    // Skip whitespace in format string
+    if (isspace_custom(*fmt_ptr)) {
+      while (isspace_custom(*fmt_ptr))
+        fmt_ptr++;
+      while (isspace_custom(*in_ptr))
+        in_ptr++;
+      continue;
+    }
+
+    if (*fmt_ptr == '%') {
+      fmt_ptr++; // Move past '%'
+
+      if (*fmt_ptr == 'x') {
+        // Parse hexadecimal integer
+        unsigned int *out = va_arg(args, unsigned int *);
+        char *end;
+        *out = (unsigned int)strtoul_custom(in_ptr, &end, 16);
+        if (end == in_ptr) {
+          // Failed to parse
+          break;
+        }
+        in_ptr = end;
+        count++;
+      } else if (*fmt_ptr == 'I') {
+        // Parse decimal integer
+        int *out = va_arg(args, int *);
+        char *end;
+        *out = (int)strtoul_custom(in_ptr, &end, 10);
+        if (end == in_ptr) {
+          // Failed to parse
+          break;
+        }
+        in_ptr = end;
+        count++;
+      } else {
+        // Unsupported format specifier
+        break;
+      }
+      fmt_ptr++;
+    } else {
+      // Literal match
+      if (*fmt_ptr != *in_ptr) {
+        break;
+      }
+      fmt_ptr++;
+      in_ptr++;
+    }
+  }
+
+  va_end(args);
+  return count;
 }

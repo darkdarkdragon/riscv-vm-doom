@@ -448,13 +448,16 @@ void R_InitTextures (void)
 	int temp3;
 
 
+ printf("xxx1\n");
 	/* Load the patch names from pnames.lmp. */
 	name[8] = 0;
 	names = W_CacheLumpName ("PNAMES", PU_STATIC);
+ printf("xxx2\n");
 	nummappatches = LONG ( *((int *)names) );
 	name_p = names+4;
 	patchlookup = alloca (nummappatches*sizeof(*patchlookup));
 
+  printf("numpathces %d\n", nummappatches);
 	for (i=0; i<nummappatches; i++)
 	{
 		strncpy (name,name_p+i*8, 8);

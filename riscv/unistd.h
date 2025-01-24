@@ -10,7 +10,7 @@
 #define W_OK (1 << 1) /* test for write permission */
 #define R_OK (1 << 2) /* test for read permission */
 
-typedef uint32_t off_t;
+typedef int32_t off_t;
 
 int access(const char *pathname, int mode);
 off_t lseek(int fildes, off_t offset, int whence);

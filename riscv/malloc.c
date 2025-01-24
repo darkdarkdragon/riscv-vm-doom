@@ -1,12 +1,9 @@
 
-#include <stdio.h>
 #include "malloc.h"
 
-// 1MB
-#define HEAP_START 1048576
-#define HEAP_SIZE 1048576
+#define MALLOC_TRACE 0
 
-#define TOTAL_MEMORY = 1048576 * 16
+static uint32_t total_allocated = 0;
 
 struct MemChunk {
   struct MemChunk *prev;
@@ -23,9 +20,10 @@ static struct MemChunk *small_heap_start;
 // Static initialization function
 // void init_function(void) __attribute__((constructor));
 void malloc_init(void) {
-  printf("Initialization function is running before main.\n");
+  // printf("Initialization function is running before main.\n");
   small_heap_start = (struct MemChunk *)HEAP_START;
   memset(small_heap_start, 0, sizeof(struct MemChunk));
+  total_allocated = 0;
   // small_heap_start.next = NULL;
   // small_heap_start.prev = NULL;
   // small_heap_end.prev = &small_heap_start;
@@ -40,6 +38,9 @@ struct MemChunk *findHole(size_t size) {
   struct MemChunk *res = small_heap_start;
   struct MemChunk *next = NULL;
   while (1) {
+#if MALLOC_TRACE
+    printf("findHole: %p\n", res);
+#endif
     if (res->next == NULL) {
       return res;
     }
@@ -61,7 +62,7 @@ void *align4(void *ptr) {
 
 void *malloc(size_t __size) {
   // fprintf(stderr, "malloc: unimplemented size %d\n", __size);
-  fprintf(stderr, "malloc size %d\n", __size);
+  fprintf(stderr, "malloc size %d total %d\n", __size, total_allocated);
   struct MemChunk *before = findHole(__size);
   if (before == NULL) {
     fprintf(stderr, "malloc: no hole found\n");
@@ -80,6 +81,10 @@ void *malloc(size_t __size) {
   new->size = __size;
   void *res = ((uint8_t *)new) + sizeof(struct MemChunk);
   // printf("malloc: %p\n", res);
+  total_allocated += __size;
+#if MALLOC_TRACE
+  printf("malloc res: %p size %d total %d\n", res, __size, total_allocated);
+#endif
   return res;
 }
 
@@ -89,13 +94,26 @@ void *realloc(void *__ptr, size_t __size) {
   if (__ptr == NULL) {
     return malloc(__size);
   }
-  struct MemChunk *cur = __ptr - sizeof(struct MemChunk);
+  struct MemChunk *cur = (struct MemChunk *)((uint8_t *)__ptr - sizeof(struct MemChunk));
+#if MALLOC_TRACE
+  printf("realloc cur %p cur size %d\n", cur, cur->size);
+#endif
   if (cur->next == NULL) {
     cur->size = __size;
+#if MALLOC_TRACE
+    printf("realloc left 1\n");
+#endif
     return __ptr;
   }
-  if (cur->next - cur - sizeof(struct MemChunk) - cur->size - 4 >= __size) {
+  int gap = (uint8_t *)cur->next - (uint8_t *)cur - sizeof(struct MemChunk) - cur->size - 4;
+#if MALLOC_TRACE
+  printf("realloc gap %d\n", gap);
+#endif
+  if (gap >= (int)__size) {
     cur->size = __size;
+#if MALLOC_TRACE
+    printf("realloc left 2\n");
+#endif
     return __ptr;
   }
   void *new = malloc(__size);
@@ -107,5 +125,7 @@ void *realloc(void *__ptr, size_t __size) {
   // free current
   cur->prev->next = cur->next;
   cur->next->prev = cur->prev;
-  return NULL;
+  // total_allocated += ;
+  total_allocated += __size;
+  return new;
 }

@@ -5,6 +5,7 @@
 
 #include <stdarg.h>
 // #include <sys/time.h>
+#include "malloc.h"
 #include <unistd.h>
 
 #include "doomdef.h"
@@ -29,43 +30,45 @@ int mb_used = 32;
 extern boolean demorecording;
 
 void I_Error(char *error, ...) {
-  /*
-      va_list argptr;
 
-      // Message first.
-      va_start (argptr,error);
-      fprintf (stderr, "Error: ");
-      vfprintf (stderr,error,argptr);
-      fprintf (stderr, "\n");
-      va_end (argptr);
+  va_list argptr;
 
-      fflush( stderr );
+  // Message first.
+  va_start(argptr, error);
+  fprintf(stderr, "Error: ");
+  vfprintf(stderr, error, argptr);
+  fprintf(stderr, "\n");
+  va_end(argptr);
 
-      //  Shutdown. Here might be other errors.
-      if (demorecording)
-              G_CheckDemoStatus();
+  fflush(stderr);
 
-      D_QuitNetGame ();
-      I_ShutdownGraphics();
+  //  Shutdown. Here might be other errors.
+  if (demorecording)
+    G_CheckDemoStatus();
 
-      va_start (argptr,error);
-      fprintf (stdout, "Error: ");
-      vfprintf (stdout,error,argptr);
-      fprintf (stdout, "\n");
-      va_end (argptr);
+  D_QuitNetGame();
+  I_ShutdownGraphics();
 
-      fflush( stdout );
+  va_start(argptr, error);
+  fprintf(stdout, "Error: ");
+  vfprintf(stdout, error, argptr);
+  fprintf(stdout, "\n");
+  va_end(argptr);
 
-*/
+  fflush(stdout);
+
   exit(-1);
 }
 
 byte *I_ZoneBase(int *size) {
-  *size = mb_used * 1024 * 1024;
-  return (byte *)malloc(*size);
+  // *size = mb_used * 1024 * 1024;
+  // return (byte *)malloc(*size);
+  *size = TOTAL_MEMORY - HEAP_SIZE - HEAP_START;
+  return (byte *)(HEAP_START + HEAP_SIZE);
 }
 
 byte *I_AllocLow(int length) {
+  printf("I_AllocLow %d\n", length);
   byte *mem;
 
   mem = (byte *)malloc(length);
@@ -78,6 +81,7 @@ byte *I_AllocLow(int length) {
 // returns time in 1/TICRATE second tics
 //
 int I_GetTime(void) {
+  printf("I_GetTime unimplemented \n");
   //   if (mselapsed>0)
   //   {
   //     return (mselapsed);
@@ -164,7 +168,4 @@ void I_Tactile(int on, int off, int total) {
 void I_WaitVBL(int count) {}
 
 ticcmd_t emptycmd;
-ticcmd_t*       I_BaseTiccmd(void)
-{
-	return &emptycmd;
-}
+ticcmd_t *I_BaseTiccmd(void) { return &emptycmd; }

@@ -191,6 +191,7 @@ Z_Malloc
 	memblock_t* rover;
 	memblock_t* newblock;
 	memblock_t* base;
+	// printf("--> Z_Malloc size %d\n", size);
 
 	size = (size + 3) & ~3;
 

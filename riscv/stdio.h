@@ -4,6 +4,7 @@
 
 // #include <stdint.h>
 #include "stdlib.h"
+#include <stdarg.h>
 #include <stdint-gcc.h>
 
 // typedef int size_t;
@@ -24,6 +25,15 @@ typedef int32_t FILE;
 #define SYS_write 64
 #define SYS_exit 93
 #define SYS_access 100
+#define SYS_fopen 101
+#define SYS_fscanf 102
+#define SYS_feof 103
+#define SYS_fclose 104
+#define SYS_open 105
+#define SYS_fstat 106
+#define SYS_read 107
+#define SYS_close 108
+#define SYS_lseek 109
 
 int printf(const char *fmt, ...);
 int sprintf(char *str, const char *fmt, ...);
@@ -41,6 +51,7 @@ int feof(FILE *);
 int fscanf(FILE *__restrict, const char *__restrict, ...);
 int sscanf(const char *__restrict, const char *__restrict, ...);
 int fflush(FILE *stream);
+int vfprintf(FILE *stream, const char *fmt, va_list ap);
 uint32_t syscall(uint32_t which, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6);
 
 #endif /* __STDIO__ */

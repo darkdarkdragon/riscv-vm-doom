@@ -369,7 +369,9 @@ void D_DoomLoop (void)
 		debugfile = fopen (filename,"w");
 	}
 
+	printf ("I_InitGraphics: \n");
 	I_InitGraphics ();
+	printf ("I_InitGraphics DONE\n");
 
 	while (1)
 	{
@@ -1057,6 +1059,7 @@ void D_DoomMain (void)
 
 	printf ("W_Init: Init WADfiles.\n");
 	W_InitMultipleFiles (wadfiles);
+	printf ("W_Init: Init WADfiles DONE.\n");
 
 
 	/* Check for -file in shareware */
@@ -1130,7 +1133,7 @@ void D_DoomMain (void)
 		break;
 	}
 
-	printf ("M_Init: Init miscellaneous info.\n");
+	printf ("M_Init: Init miscellaneous info2.\n");
 	M_Init ();
 
 	printf ("R_Init: Init DOOM refresh daemon - ");

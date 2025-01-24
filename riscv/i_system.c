@@ -8,6 +8,8 @@
 #include "malloc.h"
 #include <unistd.h>
 
+#include "encoding.h"
+
 #include "doomdef.h"
 #include "i_sound.h"
 #include "i_video.h"
@@ -81,7 +83,12 @@ byte *I_AllocLow(int length) {
 // returns time in 1/TICRATE second tics
 //
 int I_GetTime(void) {
-  printf("I_GetTime unimplemented \n");
+  uint32_t tmh = read_csr(timeh);
+  uint32_t tm = rdtime();
+  uint64_t t = ((uint64_t)tmh << 32) | tm; // nanoseconds
+  uint64_t t_mic = t / 1000;
+  int tick = t_mic * TICRATE / 1000000;
+  // printf("I_GetTime ticks %d\n", tick);
   //   if (mselapsed>0)
   //   {
   //     return (mselapsed);
@@ -101,7 +108,7 @@ int I_GetTime(void) {
   //     newtics = (tp.tv_sec-basetime)*TICRATE + tp.tv_usec*TICRATE/1000000;
   //     return newtics;
   //   }
-  return 0;
+  return tick;
 }
 
 /* */

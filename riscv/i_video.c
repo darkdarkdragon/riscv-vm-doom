@@ -112,13 +112,14 @@ void I_SetPalette (byte* palette)
 #endif
 }
 
+static int frame_no = 0;
 /* */
 /* I_StartFrame */
 /* */
 void I_StartFrame (void)
 {
 	/* er? */
-	printf("I_StartFrame\n");
+	printf("I_StartFrame %d\n", frame_no++);
 
 }
 

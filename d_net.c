@@ -263,6 +263,7 @@ char exitmsg[80];
 
 void GetPackets (void)
 {
+	// printf("GetPackets\n");
 	int netconsole;
 	int netnode;
 	ticcmd_t    *src, *dest;

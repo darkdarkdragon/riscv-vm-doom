@@ -481,7 +481,7 @@ int sscanf(const char *input, const char *format, ...) {
         }
         in_ptr = end;
         count++;
-      } else if (*fmt_ptr == 'I') {
+      } else if (*fmt_ptr == 'I' || *fmt_ptr == 'i') {
         // Parse decimal integer
         int *out = va_arg(args, int *);
         char *end;
@@ -509,4 +509,8 @@ int sscanf(const char *input, const char *format, ...) {
 
   va_end(args);
   return count;
+}
+
+void mem_write_intercept(uint32_t addr) {
+  syscall(SYS_print_mem_access, addr, 0, 0, 0, 0, 0, 0);
 }

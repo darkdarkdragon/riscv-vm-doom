@@ -14,7 +14,7 @@ typedef uint32_t size_t;
 #define HEAP_START 1048576
 #define HEAP_SIZE 1048576
 
-#define TOTAL_MEMORY 1048576 * 16
+#define TOTAL_MEMORY 1048576 * 32
 
 void malloc_init(void);
 void *malloc(size_t __size);

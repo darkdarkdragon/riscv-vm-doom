@@ -35,6 +35,11 @@ typedef int32_t FILE;
 #define SYS_close 108
 #define SYS_lseek 109
 
+#define SYS_present_screen 1024
+#define SYS_set_palette 1025
+
+#define SYS_print_mem_access 2048
+
 int printf(const char *fmt, ...);
 int sprintf(char *str, const char *fmt, ...);
 
@@ -53,5 +58,7 @@ int sscanf(const char *__restrict, const char *__restrict, ...);
 int fflush(FILE *stream);
 int vfprintf(FILE *stream, const char *fmt, va_list ap);
 uint32_t syscall(uint32_t which, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t arg5, uint32_t arg6);
+int isspace_custom(char c);
+void mem_write_intercept(uint32_t addr);
 
 #endif /* __STDIO__ */

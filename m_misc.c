@@ -352,8 +352,12 @@ void M_LoadDefaults (void)
 
 	/* set everything to base values */
 	numdefaults = sizeof(defaults)/sizeof(defaults[0]);
-	for (i=0; i<numdefaults; i++)
+	// printf("M_LoadDefaults numdefaults: %d def addr %p strparm addr %p\n", numdefaults, def, strparm);
+	for (i=0; i<numdefaults; i++) {
+		// printf(" %s now %d def val %d ", defaults[i].name, *defaults[i].location, defaults[i].defaultvalue);
 		*defaults[i].location = defaults[i].defaultvalue;
+		// printf(" new %d pointer %p\n", *defaults[i].location, defaults[i].location);
+	}
 
 	/* check for a custom default file */
 	i = M_CheckParm ("-config");
@@ -374,6 +378,7 @@ void M_LoadDefaults (void)
 			isstring = false;
 			if (fscanf (f, "%79s %[^\n]\n", def, strparm) == 2)
 			{
+				// printf("def %s str %s\n", def, strparm);
 				if (strparm[0] == '"')
 				{
 					/* get a string default */
@@ -402,6 +407,9 @@ void M_LoadDefaults (void)
 
 		fclose (f);
 	}
+	// for (i=0; i<numdefaults; i++) {
+	// 	printf(" %s now %d \n", defaults[i].name, *defaults[i].location);
+	// }
 }
 
 

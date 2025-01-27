@@ -12,7 +12,7 @@ CC = $(RISCV_PREFIX)gcc
 #CFLAGS=-g -Wall -DNORMALUNIX -DLINUX # -DUSEASM
 #CFLAGS=-g -m80387 -DALLOCA
 #CFLAGS= -I. -O -nostartfiles -g -march=rv32im  -mabi=ilp32
-CFLAGS= -I. -I./riscv -O0 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im_zicsr  -mabi=ilp32 -T ./riscv/test.ld  -mcmodel=medany
+CFLAGS= -I. -I./riscv -O2 -static -nostdlib -nostartfiles -std=gnu11 -fno-common -fno-builtin-malloc -fno-builtin-fprintf -fno-builtin-printf  -fno-tree-loop-distribute-patterns -march=rv32im_zicsr  -mabi=ilp32 -T ./riscv/test.ld  -mcmodel=medany
 #CFLAGS= -I. -O -static -march=rv32im  -mabi=ilp32
 #LDFLAGS=-L/usr/X11R6/lib
 #LIBS=-lXext -lX11 -lnsl -lm

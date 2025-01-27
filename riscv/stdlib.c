@@ -1,5 +1,6 @@
 
 #include "stdlib.h"
+#include "stdio.h"
 
 int __attribute__((weak)) main(int argc, char** argv)
 {
@@ -84,16 +85,38 @@ char *getenv(const char *) { return 0; }
 
 int my_abs(int x) { return x < 0 ? -x : x; }
 
-void exit(int) {
-  // @TODO
+void exit(int code) {
+  syscall(SYS_exit, (uint32_t)code, 0, 0, 0, 0, 0, 0);
   while (1)
     ;
 }
 
 int atoi(const char *str) {
-  // @TODO
-  return 0;
+    int result = 0;
+    int sign = 1;
+
+    // Skip leading whitespace
+    while (isspace_custom(*str)) {
+        str++;
+    }
+
+    // Handle optional sign
+    if (*str == '+' || *str == '-') {
+        if (*str == '-') {
+            sign = -1;
+        }
+        str++;
+    }
+
+    // Convert digits to integer
+    while (*str >= '0' && *str <= '9') {
+        result = result * 10 + (*str - '0');
+        str++;
+    }
+
+    return result * sign;
 }
+
 
 void _init(int cid, int nc) {
 //   init_tls();

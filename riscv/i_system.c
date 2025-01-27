@@ -59,7 +59,7 @@ void I_Error(char *error, ...) {
 
   fflush(stdout);
 
-  exit(-1);
+  exit(11);
 }
 
 byte *I_ZoneBase(int *size) {

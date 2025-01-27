@@ -61,8 +61,7 @@ void *align4(void *ptr) {
 }
 
 void *malloc(size_t __size) {
-  // fprintf(stderr, "malloc: unimplemented size %d\n", __size);
-  fprintf(stderr, "malloc size %d total %d\n", __size, total_allocated);
+  // fprintf(stderr, "malloc size %d total %d\n", __size, total_allocated);
   struct MemChunk *before = findHole(__size);
   if (before == NULL) {
     fprintf(stderr, "malloc: no hole found\n");
